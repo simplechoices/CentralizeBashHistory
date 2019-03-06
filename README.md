@@ -1,1 +1,1 @@
-# CentralizeBashHistory
+# Centralize Bash History
