@@ -1,80 +1,70 @@
-###https://github.com/simplechoices/CentralizeBashHistory
-## Enhanced the function to store it on centralized Rsyslog > Elastic serach > Kibna  
+# https://github.com/simplechoices/CentralizeBashHistory
+# Enhanced the function to store it on centralized Rsyslog > Elastic serach > Kibana  
 
 function log2syslog
 {
-## set the Hostname of present system (Client)
-   HOSTNAME=$(hostname) 
+   # collect TTY info
+   declare TTY
+   TTY=$(tty | sed 's|/dev/||g')
 
-## Set the Timestamp of command Execution with Date RFC-5424
-   CMD_EXEC_TIME=$(date '+%Y-%m-%dT%H:%M:%S%:z') 
+   ## collect USER info
+   declare WHOAMI
+   WHOAMI=${USER-$(whoami)} 
 
-## set exec the Date
-   CMD_EXEC_DATE=$(date '+%Y-%m-%d')
+   # Get src ip for ssh connection
+   declare SSH_SRC_IP
+    
+   # get src info from SSH_CLIENT if available 
+   # this can fail if we're operating under 'sudo su -' - the SSH env vars are stripped off
+   SSH_SRC_IP=${SSH_CLIENT-"ssh-client-unset"}
+   SSH_SRC_IP=${SSH_SRC_IP%% *}
 
-## Gets the Time
-   CMD_EXEC_TIME_ALONE=$(date '+%H:%M')
-
-## Checks for user’s origin IP is Empty and set equivalent mock data 
-
-   [[ -n ${SSH_CLIENT} ]] || SSH_CLIENT="noData noData noData"  
-
-   declare WHO_RUNS 
-## Variable declared for getting logged-in user details
-
-   WHO_RUNS=$(who -m | sed 's/[()]//g' | sed -r 's/ +/ /g')
-  ## Gets the Logged-in User ID, IP & Login Time
-
-   [[ -n  ${WHO_RUNS} ]] || WHO_RUNS="noData noData ${CMD_EXEC_DATE} ${CMD_EXEC_TIME_ALONE} noData"  
- ## Checks for user’s origin details are Empty and setting string equivalent mock data 
-
+   ## Variable declared for getting logged-in user executed Command
    declare COMMAND
-## Variable declared for getting logged-in user executed Command
 
-   COMMAND=$(fc -ln -0 | sed -r 's/     //g' | sed -r 's/ +/ /g') 
-## Fetch the executed Command
+   ## Fetch the executed Command
+   COMMAND=$(fc -ln -0 | sed -r 's/^[[:blank:]]*//g' | sed -r 's/[[:blank:]]+/ /g') 
 
-[[ -z ${BASH_EXECUTION_STRING} ]] || COMMAND="#000 RemotelyExecCommand ${BASH_EXECUTION_STRING}"
-## Checks for Remotely (via ssh) Executed Commands and  set the  COMMAND variable 
+   [[ -z ${BASH_EXECUTION_STRING} ]] || COMMAND="#000 RemotelyExecCommand ${BASH_EXECUTION_STRING}"
+   ## Checks for Remotely (via ssh) Executed Commands and  set the  COMMAND variable 
 
    [[ -n ${COMMAND} ]] || COMMAND="#000 CommandIsEmpty_or_ssh_login"
-## Checking for executed Command and setting string equivalent mock data if empty
+   ## Checking for executed Command and setting string equivalent mock data if empty
 
-
-## Checks if user has tried to Disable the Trap; then  SigQuit the PID ; this will reenable the logger trap
-
+   ## Checks if user has tried to Disable the Trap; then  SigQuit the PID ; this will reenable the logger trap
    if [[ ${PREVIOUS_COMMAND} != *" CommandIsEmpty_or_ssh_login" && -n  ${PREVIOUS_COMMAND} &&  ${COMMAND} == *"trap"*"-"*"DEBUG"* ]]; 
-
    then
-        kill -SIGQUIT $$                   
-    fi
+       kill -SIGQUIT $$                   
+   fi
 
-## Checks whether HISCONTROL variable was modified; then reset it
-  if [[ ${PREVIOUS_COMMAND} == *"HISTCONTROL"*"="* ]]; 
+   ## Checks whether HISCONTROL variable was modified; then reset it
+   if [[ ${PREVIOUS_COMMAND} == *"HISTCONTROL"*"="* ]]; 
    then
-    export HISTCONTROL="ignoredups"  
-  fi
+       export HISTCONTROL="ignoredups"  
+   fi
 
-## Checks if User has tried to remove the Trap; then enable it back
- if [[ ${PREVIOUS_COMMAND} == *"trap"*"-"*"SIGQUIT"* ]];
+   ## Checks if User has tried to remove the Trap; then enable it back
+   if [[ ${PREVIOUS_COMMAND} == *"trap"*"-"*"SIGQUIT"* ]];
    then
-    trap enabletrap SIGQUIT
-  fi
+      trap enabletrap SIGQUIT
+   fi
 
-## Check for deduplicate and remove for redundant commands being logged; also hard-code the hostname in the logger
-
+   ## Check for deduplicate and remove for redundant commands being logged
    if [[ -z ${PREVIOUS_COMMAND} || "${COMMAND}" != "${PREVIOUS_COMMAND}" ]] ;
     then
-      logger -n xyz.abc.com -t cmdhist -i -- "${HOSTNAME} ${CMD_EXEC_TIME} ${SSH_CLIENT} ${WHO_RUNS} ${USER} ${COMMAND}"   
+      logger -p auth.info -t cmdlog "${WHOAMI} ${TTY} ${SSH_SRC_IP} ${COMMAND}"   
       export PREVIOUS_COMMAND=${COMMAND} 
    fi
 }
+
+# set HISTCONTROL
+HISTCONTROL="ignoredups"
 
 ## enable the trap in Debug mode
 trap log2syslog DEBUG 
 
 function enabletrap {
-        trap log2syslog DEBUG  
+    trap log2syslog DEBUG  
 }
 
 ## Enabling the Trap

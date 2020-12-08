@@ -1,0 +1,3 @@
+# preserve SSH_* env vars
+# installed to /etc/sudoers.d
+Defaults	env_keep += "SSH_TTY SSH_CONNECTION SSH_CLIENT"

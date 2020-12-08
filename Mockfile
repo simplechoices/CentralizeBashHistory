@@ -1,0 +1,23 @@
+# vim: noexpandtab filetype=make
+
+# NOTE: This makefile is named weirdly to avoid conflict with deb package building 
+# you'll have to use "make -f Mockfile <target>"
+
+# builds .deb (in parent dir)
+build:
+	debuild -us -uc
+
+# setup the build environment
+setup:
+	sudo apt install dpkg-dev devscripts debhelper dh-exec shellcheck
+
+check: bashrc-patch
+	echo "#!/bin/bash" > check.sh
+	cat bashrc-patch >> check.sh
+	shellcheck check.sh
+	touch check
+
+clean:
+	dpkg-buildpackage -rfakeroot -Tclean
+	rm -f check check.sh
+	rm -f ../shell-session-logger_*
