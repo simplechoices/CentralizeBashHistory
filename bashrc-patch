@@ -37,11 +37,13 @@ function log2syslog
        kill -SIGQUIT $$                   
    fi
 
-   ## Checks whether HISCONTROL variable was modified; then reset it
-   if [[ ${PREVIOUS_COMMAND} == *"HISTCONTROL"*"="* ]]; 
-   then
-       export HISTCONTROL="ignoredups"  
-   fi
+   # Set the HISTCONTROL variable every time through
+   #
+   # This is to override setting HISTCONTROL in ~/.bashrc (set to ignoreboth via /etc/skel/.bashrc on many systems)
+   #
+   # Logically this won't take effect until a command is exectuted after login, (meaning 
+   # the first command after login might be unlogged) but practically it seems to be okay.
+   export HISTCONTROL="unset"  
 
    ## Checks if User has tried to remove the Trap; then enable it back
    if [[ ${PREVIOUS_COMMAND} == *"trap"*"-"*"SIGQUIT"* ]];
@@ -56,9 +58,6 @@ function log2syslog
       export PREVIOUS_COMMAND=${COMMAND} 
    fi
 }
-
-# set HISTCONTROL
-HISTCONTROL="ignoredups"
 
 ## enable the trap in Debug mode
 trap log2syslog DEBUG 

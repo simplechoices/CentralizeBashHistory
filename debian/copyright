@@ -1,8 +1,13 @@
 Format: https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
-Upstream-Name: shell-session-logger
-Source: https://github.com/skytap/shell-session-logger
+Upstream-Name: CentralizeBashHistory
+Upstream-Contact: kalidasganesan 
+Source: https://github.com/simplechoices/CentralizeBashHistory
 
-Files: *
+Files: bashrc-patch README.md 
+Copyright: kalidasganesan
+License: Apache-2.0
+
+Files: Mockfile,session-logger-keep-ssh-env-vars 
 Copyright: 2020 Skytap, Inc
 License: Apache-2.0
 
