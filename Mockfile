@@ -20,4 +20,4 @@ check: bashrc-patch
 clean:
 	dpkg-buildpackage -rfakeroot -Tclean
 	rm -f check check.sh
-	rm -f ../skytap-shell-session-logger_*
+	rm -f ../shell-session-logger_*

@@ -1,12 +1,12 @@
-Source: skytap-shell-session-logger
+Source: shell-session-logger
 Section: misc
 Priority: optional
 Maintainer: andrus <andrus@skytap.com>
 Build-Depends: debhelper (>=9), dh-exec
-Standards-Version: 4.1.4
+Standards-Version: 3.9.7
 Homepage: https://github.com/skytap/CentralizeBashHistory
 
-Package: skytap-shell-session-logger
+Package: shell-session-logger
 Architecture: all
 Depends: ${misc:Depends}  
 Description: logger for interactive shell sessions
