@@ -7,7 +7,7 @@ Files: bashrc-patch README.md
 Copyright: kalidasganesan
 License: Apache-2.0
 
-Files: Mockfile,session-logger-keep-ssh-env-vars 
+Files: Mockfile session-logger-keep-ssh-env-vars 
 Copyright: 2020 Skytap, Inc
 License: Apache-2.0
 
