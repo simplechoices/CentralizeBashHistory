@@ -12,7 +12,7 @@ works in "real" systems
 
 ## operation
 
-This uses the shell 'trap' DEBUG mechanism  to capture shell execution one line at a time.
+This uses the shell 'trap' DEBUG mechanism to capture shell execution one line at a time.
 
 It uses the /usr/bin/logger command to send a formatted message to the local system logger with facility auth and severity info.
 
@@ -40,7 +40,7 @@ To install tools required for building:
 To run shellcheck:
 * make -f Mockfile check
 
-To build the deb (in the parent directory):
+To build the deb (it's created in the parent directory):
 * make -f Mockfile
 
 To cleanup:
@@ -50,8 +50,6 @@ To cleanup:
 
 * Command capture can be defeated by disabling history collection using "set +o history". However, the 'set +o ...' command itself is captured
 
-* Command capture can be evaded by prefixing line with a space character  (this can be blocked by forcing env var HISTCONTROL to "ignoredups")
-
 * "sudo su -" blocks the propagation of SSH_CLIENT and related env vars. Use "sudo -i" instead. The 'sudo su -' is captured.
 
 * The command is captured before execution so exit status are not avaialable to be logged
@@ -60,9 +58,9 @@ To cleanup:
 
    shell -/bin/bash
 
- tmux does not seems to have this issue
+* It's not well tested with tmux, but tmux does seem to create login shells by default
 
-* command capture can be evaded for a sequence of operations by manually creating a subshell - i.e. by executing "bash". However, the creation itself is captured.
+* Command capture can be evaded for a sequence of operations by manually creating a subshell - i.e. by executing "bash". However, the creation itself is captured.
 
 * The initialization is aimed at bash - attempts to use /bin/sh as a login shell will fail.
 
