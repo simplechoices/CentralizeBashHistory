@@ -1,0 +1,13 @@
+Source: shell-session-logger
+Section: misc
+Priority: optional
+Maintainer: andrus <andrus@skytap.com>
+Build-Depends: debhelper (>=9), dh-exec
+Standards-Version: 3.9.7
+Homepage: https://github.com/skytap/CentralizeBashHistory
+
+Package: shell-session-logger
+Architecture: all
+Depends: ${misc:Depends}  
+Description: logger for interactive shell sessions
+ shell function to log interactive sessions

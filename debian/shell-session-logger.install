@@ -1,0 +1,3 @@
+#!/usr/bin/dh-exec
+bashrc-patch => /etc/profile.d/session-logger.sh
+session-logger-keep-ssh-env-vars => /etc/sudoers.d/session-logger-keep-ssh-env-vars
